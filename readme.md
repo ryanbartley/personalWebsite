@@ -17,7 +17,7 @@ you downloaded this repository, like so:
 we need to install a different gem first:
 
         $ gem install bundler
-        $ bundler install --without production
+        $ bundle install --without production
 
 5. To run the app, use the following command:
 
