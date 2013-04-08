@@ -35,15 +35,26 @@ To create a Heroku app, first be sure you are [signed up](https://api.heroku.com
 
 Install the Heroku gem (may require `sudo`):
 
-    gem install heroku
+    $ gem install heroku
 
 Then type the following in Terminal while inside of the project directory.
 
-    heroku create NAME_OF_YOUR_APP
+    $ heroku create NAME_OF_YOUR_APP
 
 Once this returns successfully, push your app to Heroku.
 
-    git push heroku master
+    $ git push heroku master
+
+### Setting Up the Database on Heroku
+
+In order to run a database on Heroku follow their steps for adding Postgres [here](https://devcenter.heroku.com/articles/heroku-postgresql#provisioning-the-addon). Be sure to sign up for the "dev" plan to avoid being charged.
+
+Once you have completed the steps for provisioning a database we need to migrate our database. It's quite simple:
+
+    $ heroku run irb
+    > require './app'
+    > DataMapper.auto_upgrade!
+    > exit
 
 ### TIMEZONES
 
