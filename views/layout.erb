@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Ryan Treese Bartley</title>
+	<script src="/js/jquery-1.9.1.js"></script>
+	<link rel="stylesheet" type="text/css" href="/css/application.css">
+	
+	<script src="/js/cinder/Cinder.js"></script>
+	<script src="/js/cinder/math/color.js"></script>
+	<script src="/js/cinder/math/OrigDim.js"></script>
+	<script src="/js/cinder/math/vec2.js"></script>
+	<script src="/js/cinder/math/vec3.js"></script>
+	<script src="/js/cinder/math/vec4.js"></script>
+	<script src="/js/cinder/math/rect.js"></script>
+	<script src="/js/cinder/math/quat.js"></script>
+	<script src="/js/cinder/math/ciMath.js"></script>
+	<script src="/js/cinder/math/mat4.js"></script>
+	<script src="/js/cinder/math/mat3.js"></script>
+	<script src="/js/cinder/math/mat2.js"></script>
+	<script src="/js/cinder/GeomIo.js"></script>
+	<script src="/js/cinder/gl/gl.js"></script>
+	<script src="/js/cinder/gl/Context.js"></script>
+	<script src="/js/cinder/gl/Vbo.js"></script>
+	<script src="/js/cinder/gl/Vao.js"></script>
+	<script src="/js/cinder/gl/GlslProg.js"></script>
+	<script src="/js/cinder/gl/Texture.js"></script>
+	<script src="/js/cinder/gl/GlslProg.js"></script>
+	<script src="/js/cinder/gl/Fbo.js"></script>
+	<script src="/js/cinder/Camera.js"></script>
+	<script src="/js/cinder/CameraPersp.js"></script>
+</head>
+<body>
+	<canvas id="mycanvas"></canvas>
+
+	<div id="page">
+		<div id="topmenu">
+  			<ul>
+    			<li id="about"><a href="#"><span>ME</span></a></li>
+    			<li id="projects"><a href="#"><span>PROJECTS</span></a></li>
+    			<li id="resume"><a href="#"><span>RESUME</span></a></li>
+    			<li id="contact"><a href="#"><span>CONTACT</span></a></li>
+    			<li id="llforcc"><a href="http://www.llforcc.com"><span>LLFORCC</span></a></li>
+    			<li id="github"><a href="https://github.com/ryanbartley"><span>GITHUB</span></a></li>
+    			<li id="websiteName"><a href="#"><span>RYAN TREESE BARTLEY</span></a></li>
+  			</ul>
+		</div>
+
+		<div id="content">
+			<%= yield %>
+		</div>
+	</div>
+	
+</body>
+
+<script id="vertShader" type="x-shader/x-vertex">
+	attribute vec3 vertexPos;
+	uniform mat4 modelViewMatrix;
+	uniform mat4 projectionMatrix;
+
+	void main()
+	{
+		gl_Position = projectionMatrix * modelViewMatrix * vec4(vertexPos, 1.0);
+
+	}
+</script>
+<script id="fragShader" type="x-shader/x-fragment">
+	void main() {
+		gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+	}
+</script>
+<script type="text/javascript">
+
+	MyProgram = function () {
+	this.mElementVbo = null;
+	this.mVbo = null;
+
+	this.cube = null;
+	this.mVao = null;
+	this.mGlsl = null;
+	this.projectionUniform = null;
+	this.modelUniform = null;
+
+	this.gl = cinder.getGl();
+	this.mCam = null;
+
+	return this;
+	}
+
+	MyProgram.prototype = {
+	constructor: MyProgram,
+
+	setup: function () { 
+
+		this.setupShaders();
+		this.setupBuffers();
+		this.setupCamera();
+	},
+
+	setupShaders: function () {
+		this.mGlsl = GlslProg.create( new GlslProg.Format().vertexId( "vertShader").fragmentId( "fragShader" ) );
+	},
+
+	setupBuffers: function () {
+		this.mVao = new Vao();
+		this.mVao.bind();
+
+		this.cube = new GEOM.Cube( new GEOM.Format() );
+
+		this.mVbo = new Vbo( new Vbo.Format(
+			this.gl.ARRAY_BUFFER, 
+			null, 
+			this.cube.sPositions, 
+			this.gl.STATIC_DRAW
+		) );
+
+		this.mElementVbo = new Vbo( new Vbo.Format(
+			this.gl.ELEMENT_ARRAY_BUFFER,
+			null,
+			this.cube.sIndices,
+			this.gl.STATIC_DRAW
+		) );
+		
+		this.mVbo.bind();
+
+		var vertLocation = this.mGlsl.getAttribLocation("vertexPos");
+
+		gl.enableVertexAttribArray( vertLocation );
+		gl.vertexAttribPointer( vertLocation, 3, this.gl.FLOAT, false, 0, 0 );
+	},
+
+	setupCamera: function () {
+		this.mCam = new CameraPersp();
+		console.log( cinder.getAspectRatio() );
+		this.mCam.setPerspective(60.0, cinder.getAspectRatio(), .01, 1000);
+		this.mCam.lookAt(new Vec3f( 0, 0, 5 ), new Vec3f( 0, 0, 0 ) );
+	},
+
+	update: function () {
+		
+	},
+
+	draw: function () {
+		gl.clearColor(1.0, 1.0, 1.0, 1.0);
+		gl.clear(this.gl.COLOR_BUFFER_BIT);
+
+		this.mVao.bind();
+		this.mElementVbo.bind();
+		this.mGlsl.bind();
+
+		gl.setMatrices(this.mCam);
+		gl.pushModelView();
+			gl.multModelView( Matrix44f.createRotation( new Vec3f( 0, 1, 1 ), .01 ) );
+		
+				this.mGlsl.uniform("modelViewMatrix", this.mCam.getModelViewMatrix() );
+				this.mGlsl.uniform("projectionMatrix", this.mCam.getProjectionMatrix());
+		
+				gl.drawElements( this.gl.TRIANGLE_STRIP, this.cube.getNumIndices(), this.gl.UNSIGNED_SHORT, 0 );
+
+		gl.popModelView();
+	}
+	};
+
+	function ajaxRoutine (clickedLink) {
+		$.ajax({
+  			url: clickedLink,
+  			cache: false
+		})
+  		.done(function( html ) {
+  			$("#content").html(html);
+  		});
+	}
+
+	$(document).ready(function () {
+		var height = $(document).height();
+		var width = $(document).width();
+		var canvas = document.getElementById("mycanvas");
+		canvas.height = height;
+		canvas.width = width;
+		$("#topmenu ul li").on('click', function () {
+			$('.active').removeClass('active');
+			$(this).addClass('active');
+			var id = $(this).attr('id');
+			var route = "/ajax/" + id;
+
+			ajaxRoutine(route);
+		});
+		new CINDER( "mycanvas", MyProgram );
+	});
+
+	
+</script>
+</html>

@@ -3,5 +3,119 @@ body {
 	font-family: Helvetica;
 	font-size: 14px;
 	color: #323232;
-	padding: 50px;
+	/*padding: 50px;*/
+}
+
+#mycanvas {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1;
+}
+
+#page {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	z-index: 100;
+	color: #333;
+}
+
+#topmenu {
+
+	width: auto;
+}
+
+#topmenu ul {
+	list-style-type:none;
+	margin:0;
+	padding:0;
+	line-height: 1;
+	display: block;
+	zoom: 1;
+}
+
+#topmenu ul:after {
+	content: ' ';
+	display: block;
+	font-size: 0;
+	height: 0;
+	clear: both;
+	visibility: hidden;
+}
+
+#topmenu ul li {
+	float: left;
+	display: block;
+	padding: 0;
+}
+
+#topmenu #websiteName {
+	float: right;
+}
+
+#topmenu ul li a {
+  color: #ff0000;
+  text-decoration: none;
+  display: block;
+  padding: 15px 10px;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 14px;
+  position: relative;
+  -webkit-transition: color .25s;
+  -moz-transition: color .25s;
+  -ms-transition: color .25s;
+  -o-transition: color .25s;
+  transition: color .25s;
+}
+
+#topmenu ul li a:hover {
+  color: #333333;
+}
+
+#topmenu ul li a:hover:before {
+  width: 100%;
+}
+
+#topmenu ul li.last > a:after,
+#topmenu ul li:last-child > a:after {
+  display: none;
+}
+
+#topmenu ul li.active a {
+  color: #333333;
+}
+
+#topmenu ul li.active a:before {
+  width: 100%;
+}
+@media screen and (max-width: 768px) {
+  #topmenu ul li {
+    float: none;
+  }
+  #topmenu ul li a {
+    width: 100%;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+  #topmenu ul li a:after {
+    display: none;
+  }
+  #topmenu ul li a:before {
+    height: 1px;
+    background: #ffffff;
+    width: 100%;
+    opacity: .2;
+  }
+  #topmenu ul li.last > a:before,
+  #topmenu ul li:last-child > a:before {
+    display: none;
+  }
 }
