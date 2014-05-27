@@ -30,12 +30,24 @@ Matrix44f.prototype.constructor = Matrix44f;
 Matrix44f.createTranslation = function ( rhVec, w ) {
 	switch(arguments.length) { 
 		case 1: { 
-			var ret = new Matrix44f();
-			ret.components[12] = rhVec.components[0];
-			ret.components[13] = rhVec.components[1];
-			ret.components[14] = rhVec.components[2];
-			ret.components[15] = rhVec.components[3];
-			return ret;
+			switch(rhVec.type) {
+				case CINDER.TYPES.VEC3F: {
+					var ret = new Matrix44f();
+					ret.components[12] = rhVec.components[0];
+					ret.components[13] = rhVec.components[1];
+					ret.components[14] = rhVec.components[2];
+					ret.components[15] = 1.0;
+					return ret;
+				}
+				case CINDER.TYPES.VEC4F: {
+					var ret = new Matrix44f();
+					ret.components[12] = rhVec.components[0];
+					ret.components[13] = rhVec.components[1];
+					ret.components[14] = rhVec.components[2];
+					ret.components[15] = rhVec.components[3];
+					return ret;
+				}
+			}
 		}
 		break;
 		case 2: { 
@@ -43,7 +55,7 @@ Matrix44f.createTranslation = function ( rhVec, w ) {
 			ret.components[12] = rhVec.components[0];
 			ret.components[13] = rhVec.components[1];
 			ret.components[14] = rhVec.components[2];
-			ret.components[15] = w;
+			ret.components[15] = w || 0.0;
 			return ret;
 		}
 		break;

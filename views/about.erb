@@ -1,1 +1,26 @@
-I'm in the about page.
+<div id="aboutcontent">
+	<div id="aboutpictures">
+		<img src='/images/me.jpg' id='myimg'>
+	</div>
+	<div id="aboutme">
+		<!-- <p>
+			I'm a coder, filmmaker, teacher and open-source enthusiast. 
+		</p> -->
+	</div>
+</div>
+
+<script>
+function onLoad () {
+	var size = cinder.getSize();
+	var horizontalMid = size.getX() / 2.0;
+	var verticalEighth = size.getY() / 10.0;
+	var image = $("#myimg");
+	var halfImageWidth = $(image).width() / 2.0;
+	var leftMargin = horizontalMid - halfImageWidth;
+	var topMargin = verticalEighth * 1.0;
+	$(image).css("margin-top", topMargin);
+	$(image).css("margin-left", leftMargin);
+	$(image).css("margin-right", leftMargin);
+	$(image).css("margin-bottom", 20 );
+}
+</script>

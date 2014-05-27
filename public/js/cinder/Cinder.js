@@ -7,9 +7,9 @@ function CINDER (canvasId, mApp, attributes) {
 	this.getContext = function () { return mContext; };
 	this.getCanvas = function () { return mContext.getCanvas(); }
 	this.getSize = function () { return mSize; };
-	this.getWindowWidth = function () { return mSize.x; };
-	this.getWindowHeight = function () { return mSize.y; };
-	this.getAspectRatio = function () { return mSize.x() / mSize.y(); };
+	this.getWindowWidth = function () { return mSize.getX(); };
+	this.getWindowHeight = function () { return mSize.getY(); };
+	this.getAspectRatio = function () { return mSize.getX() / mSize.getY(); };
 	this.getApp = function () { return mApp; };
 	this._setUpSignals = function() {
 		// TODO: add the rest of the events
@@ -35,9 +35,21 @@ function CINDER (canvasId, mApp, attributes) {
 		}
 		if( mApp.keyDown ) {
 			console.log("I am about to add")
-			window.addEventListener("keydown", function(ev) {
+			window.addEventListener("keydown", function (ev) {
 				console.log(ev);
 			}, false);
+		}
+		if( mApp.resize ) {
+			console.log("I am about to add resize");
+			window.addEventListener("resize", function (ev) {
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+				mSize.x(width);
+				mSize.y(height);
+				canvas.height = height;
+				canvas.width = width;
+				mApp.resize();
+			}, false); 
 		}
 	};
 

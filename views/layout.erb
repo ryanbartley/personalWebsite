@@ -69,104 +69,111 @@
 	}
 </script>
 <script type="text/javascript">
-
 	MyProgram = function () {
-	this.mElementVbo = null;
-	this.mVbo = null;
-
-	this.cube = null;
-	this.mVao = null;
-	this.mGlsl = null;
-	this.projectionUniform = null;
-	this.modelUniform = null;
-
-	this.gl = cinder.getGl();
-	this.mCam = null;
-
-	return this;
+		this.mElementVbo = null;
+		this.mVbo = null;
+	
+		this.cube = null;
+		this.mVao = null;
+		this.mGlsl = null;
+		this.projectionUniform = null;
+		this.modelUniform = null;
+	
+		this.gl = cinder.getGl();
+		this.mCam = null;
+	
+		return this;
 	}
 
 	MyProgram.prototype = {
-	constructor: MyProgram,
+		constructor: MyProgram,
 
-	setup: function () { 
+		setup: function () { 
+			this.setupShaders();
+			this.setupBuffers();
+			this.setupCamera();
+		},
 
-		this.setupShaders();
-		this.setupBuffers();
-		this.setupCamera();
-	},
+		setupShaders: function () {
+			this.mGlsl = GlslProg.create( new GlslProg.Format().vertexId( "vertShader").fragmentId( "fragShader" ) );
+		},
 
-	setupShaders: function () {
-		this.mGlsl = GlslProg.create( new GlslProg.Format().vertexId( "vertShader").fragmentId( "fragShader" ) );
-	},
+		setupBuffers: function () {
+			this.mVao = new Vao();
+			this.mVao.bind();
 
-	setupBuffers: function () {
-		this.mVao = new Vao();
-		this.mVao.bind();
+			this.cube = new GEOM.Cube( new GEOM.Format() );
 
-		this.cube = new GEOM.Cube( new GEOM.Format() );
+			this.mVbo = new Vbo( new Vbo.Format(
+				this.gl.ARRAY_BUFFER, 
+				null, 
+				this.cube.sPositions, 
+				this.gl.STATIC_DRAW
+			) );
 
-		this.mVbo = new Vbo( new Vbo.Format(
-			this.gl.ARRAY_BUFFER, 
-			null, 
-			this.cube.sPositions, 
-			this.gl.STATIC_DRAW
-		) );
+			this.mElementVbo = new Vbo( new Vbo.Format(
+				this.gl.ELEMENT_ARRAY_BUFFER,
+				null,
+				this.cube.sIndices,
+				this.gl.STATIC_DRAW
+			) );
+			
+			this.mVbo.bind();
 
-		this.mElementVbo = new Vbo( new Vbo.Format(
-			this.gl.ELEMENT_ARRAY_BUFFER,
-			null,
-			this.cube.sIndices,
-			this.gl.STATIC_DRAW
-		) );
-		
-		this.mVbo.bind();
+			var vertLocation = this.mGlsl.getAttribLocation("vertexPos");
 
-		var vertLocation = this.mGlsl.getAttribLocation("vertexPos");
+			gl.enableVertexAttribArray( vertLocation );
+			gl.vertexAttribPointer( vertLocation, 3, this.gl.FLOAT, false, 0, 0 );
+		},
 
-		gl.enableVertexAttribArray( vertLocation );
-		gl.vertexAttribPointer( vertLocation, 3, this.gl.FLOAT, false, 0, 0 );
-	},
+		setupCamera: function () {
+			this.mCam = new CameraPersp();
+			console.log( cinder.getAspectRatio() );
+			this.mCam.setPerspective(60.0, cinder.getAspectRatio(), .01, 1000);
+			this.mCam.lookAt(new Vec3f( 0, 0, 5 ), new Vec3f( 0, 0, 0 ) );
+		},
 
-	setupCamera: function () {
-		this.mCam = new CameraPersp();
-		console.log( cinder.getAspectRatio() );
-		this.mCam.setPerspective(60.0, cinder.getAspectRatio(), .01, 1000);
-		this.mCam.lookAt(new Vec3f( 0, 0, 5 ), new Vec3f( 0, 0, 0 ) );
-	},
+		resize: function () {
+			this.mCam.setPerspective(60.0, cinder.getAspectRatio(), .01, 1000 );
+			gl.viewport(0, 0, cinder.getWindowWidth(), cinder.getWindowHeight() );
+		},
 
-	update: function () {
-		
-	},
+		update: function () {
+			
+		},
 
-	draw: function () {
-		gl.clearColor(1.0, 1.0, 1.0, 1.0);
-		gl.clear(this.gl.COLOR_BUFFER_BIT);
+		draw: function () {
+			gl.clearColor(0.0, 0.0, 0.0, 1.0);
+			gl.clear(this.gl.COLOR_BUFFER_BIT);
 
-		this.mVao.bind();
-		this.mElementVbo.bind();
-		this.mGlsl.bind();
+			this.mVao.bind();
+			this.mElementVbo.bind();
+			this.mGlsl.bind();
 
-		gl.setMatrices(this.mCam);
-		gl.pushModelView();
-			gl.multModelView( Matrix44f.createRotation( new Vec3f( 0, 1, 1 ), .01 ) );
-		
-				this.mGlsl.uniform("modelViewMatrix", this.mCam.getModelViewMatrix() );
-				this.mGlsl.uniform("projectionMatrix", this.mCam.getProjectionMatrix());
-		
-				gl.drawElements( this.gl.TRIANGLE_STRIP, this.cube.getNumIndices(), this.gl.UNSIGNED_SHORT, 0 );
+			gl.setMatrices(this.mCam);
+			gl.pushModelView();
+				gl.multModelView( Matrix44f.createRotation( new Vec3f( 0, 1, 1 ), .01 ) );
 
-		gl.popModelView();
-	}
+
+			
+					this.mGlsl.uniform("modelViewMatrix", gl.getModelView() );
+					this.mGlsl.uniform("projectionMatrix", gl.getProjection());
+			
+					gl.drawElements( this.gl.TRIANGLE_STRIP, this.cube.getNumIndices(), this.gl.UNSIGNED_SHORT, 0 );
+
+			gl.popModelView();
+		}
 	};
 
 	function ajaxRoutine (clickedLink) {
 		$.ajax({
-  			url: clickedLink,
+  			url: "/ajax/" + clickedLink,
   			cache: false
 		})
   		.done(function( html ) {
+  			location.hash = clickedLink;
   			$("#content").html(html);
+  			onLoad();
   		});
 	}
 
@@ -180,13 +187,10 @@
 			$('.active').removeClass('active');
 			$(this).addClass('active');
 			var id = $(this).attr('id');
-			var route = "/ajax/" + id;
 
-			ajaxRoutine(route);
+			ajaxRoutine(id);
 		});
 		new CINDER( "mycanvas", MyProgram );
 	});
-
-	
 </script>
 </html>
