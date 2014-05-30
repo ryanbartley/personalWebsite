@@ -127,7 +127,7 @@ body {
 	background-color: #333333;
 }
 
-@media screen and (max-width: 768px), screen and (device-width: 768px) {
+@media only screen and (max-width: 768px), only screen and (device-width: 768px) {
   #topmenu ul li {
     float: none;
   }
@@ -139,6 +139,9 @@ body {
   }
   #topmenu ul li a:after {
     display: none;
+  }
+  #topmenu #websitName {
+  	float: none;
   }
   #topmenu ul li a:before {
     height: 1px;
