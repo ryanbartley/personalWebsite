@@ -76,7 +76,25 @@ body {
 }
 
 #topmenu ul li a:hover {
-  color: #333333;
+  color: #888888;
+}
+
+#topmenu ul li a:before {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  top: 5px;
+  width: 0;
+  height: 80%;
+  opacity: .5;
+  background: #444444;
+  -webkit-transition: width .25s;
+  -moz-transition: width .25s;
+  -ms-transition: width .25s;
+  -o-transition: width .25s;
+  transition: width .25s;
 }
 
 #topmenu ul li a:hover:before {
@@ -89,7 +107,7 @@ body {
 }
 
 #topmenu ul li.active a {
-  color: #333333;
+  color: #888888;
 }
 
 #topmenu ul li.active a:before {
@@ -101,14 +119,15 @@ body {
 }
 
 #aboutme {
-	color: #555555;
+	color: #888888;
 	margin-top: 10px;
 	margin-left: 100px;
 	margin-right: 100px;
 	font-size: 25px;
+	background-color: #333333;
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 768px), screen and (device-width: 768px) {
   #topmenu ul li {
     float: none;
   }

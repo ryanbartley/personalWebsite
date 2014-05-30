@@ -205,7 +205,7 @@ Matrix44f.createScale = function (rhType) {
 				ret.setAt(0, 0, rhType.components[0]);
 				ret.setAt(1, 1, rhType.components[1]);
 				ret.setAt(2, 2, rhType.components[2]);
-				ret.setAt(3, 3, rhType.components[3]);
+				ret.setAt(3, 3, 1);
 				return ret;
 			}
 			break;
@@ -232,7 +232,7 @@ Matrix44f.createScale = function (rhType) {
 				ret.setAt(0, 0, rhType.components[0]);
 				ret.setAt(1, 1, rhType.components[1]);
 				ret.setAt(2, 2, rhType.components[2]);
-				ret.setAt(3, 3, rhType.components[3]);
+				ret.setAt(3, 3, 1);
 				return ret;
 			}
 			break;
@@ -1011,13 +1011,14 @@ Matrix44Base.prototype.rotate = function (rhVec, radians) { this.multEq( this.CO
 Matrix44Base.prototype.rotateEuler = function (rhVec) { this.multEq( this.CONSTRUCTOR_TYPE.createRotationEuler(rhVec) ); },
 Matrix44Base.prototype.rotateFromTo = function (fromVec, toVec, worldUpVec) { this.multEq( this.CONSTRUCTOR_TYPE.createRotationFromTo(fromVec, toVec, worldUpVec) ); };
 Matrix44Base.prototype.scale = function (rhType) {
+	console.log(rhType);
 	if( rhType.type !== undefined ) {
 		this.multEq( this.CONSTRUCTOR_TYPE.createScale(rhType) );
 	}
 	else {
 		var opM = this.CONSTRUCTOR_TYPE.createScale( rhType );
 		var mat = this;
-		this = op.mult(mat);
+		mat = opM.mult(mat);
 	}
 };
 Matrix44Base.prototype.invertTransform = function () {	

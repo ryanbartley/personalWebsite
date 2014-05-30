@@ -178,6 +178,11 @@ ColorBaseRGB.prototype.b = function (b) {
 		return this.components[2];
 	}
 };
+ColorBaseRGB.prototype.equals = function (color) {
+	return this.components[0] === color.components[0] &&
+			this.components[1] === color.components[1] &&
+			this.components[2] === color.components[2];
+}
 ColorBaseRGB.prototype.add = function (color) {
 	if( this.ARRAY_TYPE === color.ARRAY_TYPE ) {
 		return new this.CONSTUCTOR_TYPE( 
@@ -528,6 +533,17 @@ ColorBaseRGBA.prototype.a = function (a) {
 		return this.components[3];
 	}
 };
+ColorBaseRGBA.prototype.equals = function (color) {
+	if( this.ARRAY_TYPE === color.ARRAY_TYPE ) {
+		return this.components[0] === color.components[0] &&
+			this.components[1] === color.components[1] &&
+			this.components[2] === color.components[2] &&
+			this.components[3] === color.components[3];
+	}
+	else {
+		return false;
+	}
+}
 ColorBaseRGBA.prototype.add = function (color) {
 	if( this.ARRAY_TYPE === color.ARRAY_TYPE ) {
 		return new this.CONSTUCTOR_TYPE( 
@@ -877,6 +893,10 @@ ColorBaseRGBA.prototype.lerp = function (fact, color) {
 	return new this.CONSTUCTOR_TYPE(
 		 this.components[0] + ( color.components[0] - this.components[0] ) * fact, 
 		 this.components[1] + ( color.components[1] - this.components[1] ) * fact, 
-		 this.components[2] + ( color.components[2] - this.components[2] ) * fact 
+		 this.components[2] + ( color.components[2] - this.components[2] ) * fact,
+		 this.components[3] + ( color.components[3] - this.components[3] ) * fact 
 	);
 };
+ColorBaseRGBA.prototype.toS = function () {
+	return "r: " + this.components[0] + ", g: " + this.components[1] + ", b: " + this.components[2] + ", a: " + this.components[3];
+}

@@ -3,6 +3,10 @@ function CINDER (canvasId, mApp, attributes) {
 	var mContext = new CINDER.Context(canvasId, attributes);
 	var mSize 	= new Vec2i( mContext.getCanvas().width, mContext.getCanvas().height );
 
+	var currentDate = new Date();
+	var mStartTime = currentDate.getTime();
+	var mCurrentFrame = 0;
+
 	this.getGl = function () { return mContext.getGl(); };
 	this.getContext = function () { return mContext; };
 	this.getCanvas = function () { return mContext.getCanvas(); }
@@ -11,6 +15,11 @@ function CINDER (canvasId, mApp, attributes) {
 	this.getWindowHeight = function () { return mSize.getY(); };
 	this.getAspectRatio = function () { return mSize.getX() / mSize.getY(); };
 	this.getApp = function () { return mApp; };
+	this.getElapsedFrames = function () { return mCurrentFrame; }
+	this.getElapsedSeconds = function () { 
+		currentDate = new Date();
+		return (currentDate.getTime() - mStartTime) * .001;
+	};
 	this._setUpSignals = function() {
 		// TODO: add the rest of the events
 		var canvas = this.getCanvas();
@@ -72,6 +81,7 @@ function CINDER (canvasId, mApp, attributes) {
 		
 		mApp.draw();
 
+		++mCurrentFrame;
 	};
 
 	this._applicationSetup();

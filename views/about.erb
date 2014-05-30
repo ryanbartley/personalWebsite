@@ -1,26 +1,57 @@
 <div id="aboutcontent">
 	<div id="aboutpictures">
-		<img src='/images/me.jpg' id='myimg'>
+		<img src='/images/me.jpg' id='myimg' onload="loadImage()">
 	</div>
 	<div id="aboutme">
-		<!-- <p>
+		<p>
 			I'm a coder, filmmaker, teacher and open-source enthusiast. 
-		</p> -->
+		</p>
 	</div>
 </div>
 
 <script>
-function onLoad () {
-	var size = cinder.getSize();
-	var horizontalMid = size.getX() / 2.0;
-	var verticalEighth = size.getY() / 10.0;
-	var image = $("#myimg");
-	var halfImageWidth = $(image).width() / 2.0;
-	var leftMargin = horizontalMid - halfImageWidth;
-	var topMargin = verticalEighth * 1.0;
-	$(image).css("margin-top", topMargin);
-	$(image).css("margin-left", leftMargin);
-	$(image).css("margin-right", leftMargin);
-	$(image).css("margin-bottom", 20 );
-}
+	var aboutUpdateInfo = null;
+
+	function UpdateInfo () {
+		this.mStartTime = cinder.getElapsedSeconds();
+		this.mCurrentScale = new Vec3f( 1.1, 1.1, 1.1 );
+		this.mTargetScale = new Vec3f( 10.0, 10.0, 10.0 );
+		this.mRate = 1.0;
+		this.mCurrentTime = this.mStartTime;
+	}
+
+	function loadImage () {
+		var size = cinder.getSize();
+		var horizontalMid = size.getX() / 2.0;
+		var verticalEighth = size.getY() / 10.0;
+		var image = $("#myimg")[0];
+		var halfImageWidth = image.width / 2.0;
+		var leftMargin = horizontalMid - halfImageWidth;
+		var topMargin = verticalEighth * 1.0;
+		$(image).css("margin-top", 20);
+		$(image).css("margin-left", leftMargin);
+		$(image).css("margin-right", leftMargin);
+		$(image).css("margin-bottom", 10 );
+	}
+
+	function onOpenPage () {
+		cinder.getApp().setUpdateFunc( aboutUpdate );
+		aboutUpdateInfo = new UpdateInfo();
+	}
+
+	function onClosePage () {
+		cinder.getApp().setUpdateFunc( null );
+		aboutUpdateInfo = null;
+	}
+
+	function aboutUpdate () {
+		var app = cinder.getApp();
+		// aboutUpdateInfo.mCurrentTime = cinder.getElapsedSeconds();
+		// var timeDiff = aboutUpdateInfo.mCurrentTime - aboutUpdateInfo.mStartTime;
+		// if( timeDiff >= aboutUpdateInfo.mRate ) {
+		// 	aboutUpdateInfo.mCurrentScale.lerpEq( timeDiff / aboutUpdateInfo.mRate, aboutUpdateInfo.mTargetScale );
+		// }
+		// app.mModelMatrix.scale( aboutUpdateInfo.mCurrentScale );
+	}
+
 </script>

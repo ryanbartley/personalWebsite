@@ -64,11 +64,15 @@
 	}
 </script>
 <script id="fragShader" type="x-shader/x-fragment">
+	precision mediump float;
+	uniform vec4 Color;
+
 	void main() {
-		gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+		gl_FragColor = Color;
 	}
 </script>
 <script type="text/javascript">
+
 	MyProgram = function () {
 		this.mElementVbo = null;
 		this.mVbo = null;
@@ -76,8 +80,12 @@
 		this.cube = null;
 		this.mVao = null;
 		this.mGlsl = null;
-		this.projectionUniform = null;
-		this.modelUniform = null;
+		this.mModelMatrix = null;
+		this.mTargetColor = null;
+		this.mCurrentColor = null;
+		this.mColorHoverStartTime = null;
+		this.mUpdateFunc = null;
+		this.mCurrentDegree = 0;
 	
 		this.gl = cinder.getGl();
 		this.mCam = null;
@@ -117,7 +125,11 @@
 				this.cube.sIndices,
 				this.gl.STATIC_DRAW
 			) );
-			
+
+			this.mCurrentColor = new ColorA( 0.0, 0.0, 0.0, 1.0 );
+			this.mTargetColor = new ColorA( 1.0, 0.0, 0.0, 1.0 );
+			this.mModelMatrix = Matrix44f.createRotation( new Vec3f( 0, 1, 1 ), .01 );
+
 			this.mVbo.bind();
 
 			var vertLocation = this.mGlsl.getAttribLocation("vertexPos");
@@ -128,9 +140,23 @@
 
 		setupCamera: function () {
 			this.mCam = new CameraPersp();
-			console.log( cinder.getAspectRatio() );
 			this.mCam.setPerspective(60.0, cinder.getAspectRatio(), .01, 1000);
 			this.mCam.lookAt(new Vec3f( 0, 0, 5 ), new Vec3f( 0, 0, 0 ) );
+		},
+
+		setUpdateFunc: function (updateFunc) {
+			this.mUpdateFunc = updateFunc;
+		},
+
+		transitionColor: function (hover) {
+			if( hover ) {
+				this.mColorHoverStartTime = cinder.getElapsedSeconds();
+				this.mTargetColor.setFromElements( 0.3, 0.3, 0.3, 1.0 );
+			}
+			else {
+				this.mColorHoverStartTime = cinder.getElapsedSeconds();
+				this.mTargetColor.setFromElements( 1.0, 0.0, 0.0, 1.0 );
+			}
 		},
 
 		resize: function () {
@@ -139,7 +165,24 @@
 		},
 
 		update: function () {
-			
+
+
+			if( ! this.mCurrentColor.equals(this.mTargetColor) ) {
+				var timeDifference = cinder.getElapsedSeconds() - this.mColorHoverStartTime;
+				if( timeDifference <= .25 ) {
+					this.mCurrentColor = this.mCurrentColor.lerp( timeDifference / .25, this.mTargetColor);
+				}
+				else {
+					this.mCurrentColor.setFromColorA(this.mTargetColor);
+				}
+			}
+
+			if( this.mUpdateFunc != null ) {
+				this.mUpdateFunc();
+			}
+			++this.mCurrentDegree;
+			this.mModelMatrix.multEq( Matrix44f.createRotation( new Vec3f( 1, 0, 1 ), MATH.toRadians(1) ) );
+
 		},
 
 		draw: function () {
@@ -150,22 +193,24 @@
 			this.mElementVbo.bind();
 			this.mGlsl.bind();
 
+			gl.pushMatrices();
 			gl.setMatrices(this.mCam);
 			gl.pushModelView();
-				gl.multModelView( Matrix44f.createRotation( new Vec3f( 0, 1, 1 ), .01 ) );
+				gl.setModelView( this.mCam.getModelViewMatrix().mult( this.mModelMatrix ) );
 
-
-			
+					this.mGlsl.uniform("Color", this.mCurrentColor );
 					this.mGlsl.uniform("modelViewMatrix", gl.getModelView() );
 					this.mGlsl.uniform("projectionMatrix", gl.getProjection());
 			
 					gl.drawElements( this.gl.TRIANGLE_STRIP, this.cube.getNumIndices(), this.gl.UNSIGNED_SHORT, 0 );
 
 			gl.popModelView();
+			gl.popMatrices();
 		}
 	};
 
 	function ajaxRoutine (clickedLink) {
+		onClosePage();
 		$.ajax({
   			url: "/ajax/" + clickedLink,
   			cache: false
@@ -173,7 +218,7 @@
   		.done(function( html ) {
   			location.hash = clickedLink;
   			$("#content").html(html);
-  			onLoad();
+  			onOpenPage();
   		});
 	}
 
@@ -183,14 +228,21 @@
 		var canvas = document.getElementById("mycanvas");
 		canvas.height = height;
 		canvas.width = width;
-		$("#topmenu ul li").on('click', function () {
+		var topMenu = $("#topmenu ul li");
+		topMenu.on('click', function () {
 			$('.active').removeClass('active');
 			$(this).addClass('active');
 			var id = $(this).attr('id');
-
 			ajaxRoutine(id);
 		});
+		$("#websiteName").addClass('active');
 		new CINDER( "mycanvas", MyProgram );
+		topMenu.hover( function () {
+			cinder.getApp().transitionColor(true);
+		}, function () {
+			cinder.getApp().transitionColor(false);
+		});
+		onOpenPage();
 	});
 </script>
 </html>

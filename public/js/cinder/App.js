@@ -12,7 +12,6 @@ App.prototype = {
 	shutdown: function () {
 		
 	},
-	
 
 	update: function () {
 		
