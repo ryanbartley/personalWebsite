@@ -140,9 +140,6 @@ body {
   #topmenu ul li a:after {
     display: none;
   }
-  #topmenu #websitName {
-  	float: none;
-  }
   #topmenu ul li a:before {
     height: 1px;
     background: #ffffff;
@@ -153,4 +150,41 @@ body {
   #topmenu ul li:last-child > a:before {
     display: none;
   }
+}
+
+@media only screen and (min-width: 1024px) and (max-width: 1199px){
+
+}
+
+@media only screen and (min-width: 768px) and (max-width: 1023px){
+
+}
+
+@media only screen and (min-width: 480px) and (max-width: 767px){
+	#topmenu ul li {
+  	  float: none;
+  	}
+  	#topmenu ul li a {
+  	  width: 100%;
+  	  -moz-box-sizing: border-box;
+  	  -webkit-box-sizing: border-box;
+  	  box-sizing: border-box;
+  	}
+  	#topmenu ul li a:after {
+  	  display: none;
+  	}
+  	#topmenu ul li a:before {
+  	  height: 1px;
+  	  background: #ffffff;
+  	  width: 100%;
+  	  opacity: .2;
+  	}
+  	#topmenu ul li.last > a:before,
+  	#topmenu ul li:last-child > a:before {
+  	  display: none;
+  	}
+}
+
+@media only screen and (min-width: 0px) and (max-width: 479px){
+
 }
