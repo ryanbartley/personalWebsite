@@ -73,6 +73,19 @@
 </script>
 <script type="text/javascript">
 
+	function checkPixelRatio () {
+		if( window.devicePixelRatio ) {
+			return window.devicePixelRatio;
+		}
+		else {
+			return 1;
+		}
+	}
+
+	function isRetina () {
+		return checkPixelRatio === 2 ? true : false;
+	}
+
 	MyProgram = function () {
 		this.mElementVbo = null;
 		this.mVbo = null;
@@ -222,6 +235,20 @@
   		});
 	}
 
+	function cinderSetupFunc () {
+		if( ! isRetina() ) {
+			new CINDER( "mycanvas", MyProgram );
+			topMenu.hover( function () {
+				cinder.getApp().transitionColor(true);
+			}, function () {
+				cinder.getApp().transitionColor(false);
+			});
+		}
+		else {
+			cinder.mSetup = false;
+		}
+	}
+
 	$(document).ready(function () {
 		var height = $(document).height();
 		var width = $(document).width();
@@ -236,12 +263,7 @@
 			ajaxRoutine(id);
 		});
 		$("#websiteName").addClass('active');
-		new CINDER( "mycanvas", MyProgram );
-		topMenu.hover( function () {
-			cinder.getApp().transitionColor(true);
-		}, function () {
-			cinder.getApp().transitionColor(false);
-		});
+		cinderSetupFunc();
 		onOpenPage();
 	});
 </script>
