@@ -78,5 +78,7 @@ DEPENDENCIES
   data_mapper
   dm-postgres-adapter
   dm-sqlite-adapter
-  json
   sinatra
+
+BUNDLED WITH
+   1.10.6
