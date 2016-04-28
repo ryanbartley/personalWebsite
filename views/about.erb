@@ -1,24 +1,46 @@
 <div id="aboutcontent">
 	<div id="aboutpictures">
-		<img src='/images/me.jpg' id='myimg' onload="loadImage()">
+		<img src='/images/me.jpg' id='myimg' style="visibility: hidden;" onload="loadImage()">
 	</div>
-	<div id="aboutme">
+	<div id="aboutme" style="visibility: hidden;">
 		<p>
-			I'm a coder, filmmaker, teacher and open-source enthusiast. 
+			<div class="content--markdown candidate-profile__section--xs">
+
+				<h2>ORIGIN</h2>
+
+					<p>I love telling stories. Narrative and structure have played a huge role in every pursuit since I was a child. Before becoming a programmer, I was a successful filmmaker, editor and co-owner of a boutique, production/post-production company called Ghost Town Media. Over the years, I concepted, directed and edited numerous projects with some of the biggest names in music, such as <a href="https://www.youtube.com/watch?v=wMH0e8kIZtE">Kanye West</a>, <a href="https://vimeo.com/46298072">Jay Z</a>, <a href="https://youtu.be/MmZexg8sxyk">MGMT</a>, <a href="https://www.youtube.com/watch?v=jfzJo8TBQfw">Linkin Park</a>, and largest companies, like <a href="https://www.youtube.com/watch?v=KVHdI4Kztrc">Disney</a>, <a href="https://www.youtube.com/watch?v=YkOPTuXGwJA">Rhapsody</a> and <a href="https://vimeo.com/30745512">Red Bull</a>. While working on Linkin Park's "A Thousand Suns" tour, I became enamored with "new media", and specifically Quartz Composer. All of a sudden, I could edit and produce content in real-time. Seeing the potential in this new way of creating, I sold my part in the company and went back to school.</p>
+
+					<p>I attended NYU in a program called Interactive Telecommunications Program (ITP). Due to the free-form nature of the program, I was able to focus on the intersection of art and programming. For me, programming became an extension of storytelling. For instance, one of my second year <a href="https://vimeo.com/108622757">projects</a> was pure theater. After my first year, I took an internship with The Barbarian Group to work on <a href="https://libcinder.org/">Cinder</a>, an open-source, creative framework designed to allow artists, designers and programmers to communicate and iterate using C++. During my time there, I helped in modernizing the OpenGL API within Cinder. Graphics programming and interaction became not only a passion but an outlet. </p>
+
+				<h2>PRESENT</h2>
+
+					<p>Since graduating ITP, I’ve led many development teams on large scale projects. Transitioning to the world of development was easier than I thought. My background in film prepared me for the tight deadlines, client wishes, and long hours. My roster of clients became reminiscent of that time as well, working with companies such as <a href="http://www.themill.com/portfolio/2614/ride-the-slide">Lexus</a>, AT&amp;T, <a href="http://www.pattenstudio.com/intel/">Intel</a> and <a href="http://roberthodgin.com/portfolio/work/taxi-taxi/">Samsung</a>, and design firms like The Mill and Control Group. The AT&amp;T project won the World Class Center Award from the Association of Briefing Program Managers. Also, my work on the Lexus project was featured on the <a href="https://www.unrealengine.com/blog/the-lexus-hoverboard-ride-the-slide-experience-shows-off-slick-moves-with-unreal-engine-4">Unreal Blog</a>. This work is so exciting because of the diverse problem set. Unlike film, where I felt there was only so far I could grow, programming seems infinite. I spend a great deal of time reading to keep myself always on the edge of what's possible. More recently, I'm becoming very involved with integrating Vulkan into Cinder.  </p>
+
+				<h2>SIDE</h2>
+
+					<p>As I mentioned before, I love creating graphics and interactive applications. So much so that for my thesis, I created a small, robust game engine that sits atop Cinder. Interest in game development was an inevitable culmination of my different interests and background. With the engine, I was able to create a 3D version of the 1986 game Arkanoid in a week. I was hooked. I created the game engine of my thesis project to help with this goal. I've torn it apart and recreated it multiple times especially during my research residency at ITP. I'm now at a place where I'm able to iterate on the game ideas I have. I'm currently producing an homage to the game Syndicate from the 90's. </p>
+
+					<p>During school, I found joy in teaching programming and became the first student at ITP to teach a semester course for credit. The topic I taught was 3D Programming with WebGL, a subject I had become intimate with during my internship with Cinder. I’m still very passionate about teaching and workshopping. I volunteer with an organization called CodeNow, committed to teaching underserved high school students how to code. It's incredible to watch the "a-ha" moment with the children. It's something that is so intrinsic to programming; a person with no prior experience can within a few hours realize a world of endless potential. I also host numerous hackathons for people interested in learning Cinder.</p>
+
+				<h2>NEXT</h2>
+
+					<p>I love doing the work I'm doing. I enjoy the responsibility and problem solving afforded by developing. Everything is a puzzle and there are so many ways to break down solving it. What I’d love to find is a place where I can continue to learn and to grow. Where I can take on a lead role in bringing my interests, System/Graphics/Networking. </p>
+			</div>
 		</p>
 	</div>
 </div>
 
 <script>
-	var aboutUpdateInfo = null;
+	// var aboutUpdateInfo = null;
 
-	function UpdateInfo () {
-		this.mStartTime = cinder.getElapsedSeconds();
-		this.mCurrentScale = new Vec3f( 1.1, 1.1, 1.1 );
-		this.mTargetScale = new Vec3f( 10.0, 10.0, 10.0 );
-		this.mRate = 1.0;
-		this.mCurrentTime = this.mStartTime;
-	}
+	// function UpdateInfo () {
+	// 	this.mStartTime = cinder.getElapsedSeconds();
+	// 	this.mCurrentScale = new Vec3f( 1.1, 1.1, 1.1 );
+	// 	this.mTargetScale = new Vec3f( 2.0, 2.0, 2.0 );
+	// 	this.mRate = 3.0;
+	// 	this.mCurrentTime = this.mStartTime;
+	// 	this.originalModelMatrix = null;
+	// }
 
 	function loadImage () {
 		var size = cinder.getSize();
@@ -28,30 +50,42 @@
 		var halfImageWidth = image.width / 2.0;
 		var leftMargin = horizontalMid - halfImageWidth;
 		var topMargin = verticalEighth * 1.0;
+		console.log(leftMargin);
 		$(image).css("margin-top", 20);
 		$(image).css("margin-left", leftMargin);
 		$(image).css("margin-right", leftMargin);
 		$(image).css("margin-bottom", 10 );
+		$(image).css("visibility", "visible");
+		var aboutSection = $("#aboutme")[0];
+		$(aboutSection).css("visibility", "visible");
+
 	}
 
-	function onOpenPage () {
-		cinder.getApp().setUpdateFunc( aboutUpdate );
-		aboutUpdateInfo = new UpdateInfo();
-	}
+	// function onOpenPage () {
+	// 	cinder.getApp().setUpdateFunc( aboutUpdate );
+	// 	aboutUpdateInfo = new UpdateInfo();
+	// 	aboutUpdateInfo.originalModelMatrix = cinder.getApp().mModelMatrix;
+	// }
 
-	function onClosePage () {
-		cinder.getApp().setUpdateFunc( null );
-		aboutUpdateInfo = null;
-	}
+	// function onClosePage () {
+	// 	cinder.getApp().setUpdateFunc( null );
+	// 	aboutUpdateInfo = null;
+	// 	cinder.getApp().mModelMatrix = aboutUpdateInfo.originalModelMatrix;
+	// }
 
-	function aboutUpdate () {
-		var app = cinder.getApp();
-		// aboutUpdateInfo.mCurrentTime = cinder.getElapsedSeconds();
-		// var timeDiff = aboutUpdateInfo.mCurrentTime - aboutUpdateInfo.mStartTime;
-		// if( timeDiff >= aboutUpdateInfo.mRate ) {
-		// 	aboutUpdateInfo.mCurrentScale.lerpEq( timeDiff / aboutUpdateInfo.mRate, aboutUpdateInfo.mTargetScale );
-		// }
-		// app.mModelMatrix.scale( aboutUpdateInfo.mCurrentScale );
-	}
+	// function aboutUpdate () {
+	// 	var app = cinder.getApp();
+	// 	aboutUpdateInfo.mCurrentTime = cinder.getElapsedSeconds();
+	// 	var timeDiff = aboutUpdateInfo.mCurrentTime - aboutUpdateInfo.mStartTime;
+	// 	aboutUpdateInfo.mCurrentScale.lerpEq( timeDiff / aboutUpdateInfo.mRate, aboutUpdateInfo.mTargetScale );
+	// 	var current = aboutUpdateInfo.mCurrentScale.getComponents();
+	// 	var target = aboutUpdateInfo.mTargetScale.getComponents();
+	// 	app.mModelMatrix = aboutUpdateInfo.originalModelMatrix.clone();
+	// 	app.mModelMatrix.scale( aboutUpdateInfo.mCurrentScale );
+	// 	if( current[0] >= target[0] || current[1] >= target[1] || current[2] >= target[2] )
+	// 		return false;
+	// 	else
+	// 		return true;
+	// }
 
 </script>

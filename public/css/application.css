@@ -1,5 +1,5 @@
 body {
-	background-color: #000;
+	background-color: #FFF;
 	font-family: Helvetica;
 	font-size: 14px;
 	color: #323232;
@@ -119,12 +119,13 @@ body {
 }
 
 #aboutme {
-	color: #888888;
+	color: #000000;
 	margin-top: 10px;
 	margin-left: 100px;
 	margin-right: 100px;
-	font-size: 25px;
-	background-color: #333333;
+	font-size: 12px;
+  text-align: justify;
+  text-justify: inter-word;
 }
 
 @media only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {

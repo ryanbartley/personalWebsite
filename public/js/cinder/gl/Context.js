@@ -219,7 +219,6 @@ CINDER.Context = function (canvasId, attributes) {
 	// TODO: Implement OrigDim
 	this.viewport = function ( viewportOrigDim ) {
 		if( this.setStackState( mViewportStack, viewportOrigDim ) ) {
-			console.log(viewportOrigDim); 
 			cinder.getGl().viewport( 
 				viewportOrigDim.components[0], viewportOrigDim.components[1], 
 				viewportOrigDim.components[2], viewportOrigDim.components[3] 

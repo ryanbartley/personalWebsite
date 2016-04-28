@@ -10,7 +10,6 @@ function GlslProg (format) {
 	this.mActiveAttribTypesCached = false;
 	this.mUniformNameToSemanticMap = this.sDefaultUniformNameToSemanticMap;
 	this.mAttribNameToSemanticMap = this.sDefaultAttribNameToSemanticMap;
-	console.log("This",this.mAttribNameToSemanticMap);
 	this.init(format);
 
 	return this;

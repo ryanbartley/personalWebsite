@@ -349,7 +349,6 @@ QuatBase.prototype.normalize = function () {
 };
 QuatBase.prototype.normalized = function () {
 	var result = new Quatf(this);
-	console.log(result);
 	var len = this.length();
 	if( len ) {
 		result.components[0] /= len;

@@ -49,7 +49,6 @@ function CINDER (canvasId, mApp, attributes) {
 			}, false);
 		}
 		if( mApp.resize ) {
-			console.log("I am about to add resize");
 			window.addEventListener("resize", function (ev) {
 				var width = window.innerWidth;
 				var height = window.innerHeight;

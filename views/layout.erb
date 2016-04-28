@@ -2,7 +2,7 @@
 <html>
 <head>
 	<title>Ryan Treese Bartley</title>
-	<script src="/js/jquery-1.9.1.js"></script>
+	<script src="/js/jquery-1.9.1.js"></script>	
 	<link rel="stylesheet" type="text/css" href="/css/application.css">
 	
 	<script src="/js/cinder/Cinder.js"></script>
@@ -73,6 +73,38 @@
 </script>
 <script type="text/javascript">
 
+	Cube = function ( translation, indices, index, color ) {
+		this.translationMatrix = translation;
+		this.gridNeighborIndices = indices;
+		this.index = index;
+		this.color = color;
+
+		this.alive = false;
+		this.mTimeToGenerateNext = 0;
+		this.mTimeToDie = 0;
+	};
+
+	Cube.prototype.chooseNext = function() {
+		this.chosenNext = true;
+		var length = this.gridNeighborIndices.length;
+		var pos = Math.round(length * Math.random()) % length;
+		return this.gridNeighborIndices[pos];
+	};
+
+	Cube.prototype.isAlive = function ( elapsed ) {
+		return this.mTimeToDie > elapsed;
+	};
+
+	Cube.prototype.activate = function ( elapsed ) {
+		this.chosenNext = false;
+		this.mTimeToGenerateNext = elapsed + 0.016;
+		this.mTimeToDie = elapsed + 2.0;
+	};
+
+	Cube.prototype.shouldChooseNext = function( elapsed ) {
+		return ! this.chosenNext && this.mTimeToGenerateNext < elapsed;
+	};
+
 	function checkPixelRatio () {
 		if( window.devicePixelRatio ) {
 			return window.devicePixelRatio;
@@ -102,6 +134,9 @@
 	
 		this.gl = cinder.getGl();
 		this.mCam = null;
+		this.cubes = [];
+		this.activeCubes = [];
+		this.centerCube = null;
 	
 		return this;
 	}
@@ -113,10 +148,48 @@
 			this.setupShaders();
 			this.setupBuffers();
 			this.setupCamera();
+			this.setupCubes();
+			gl.enableDepthRead();
+			gl.enableDepthWrite();
 		},
 
 		setupShaders: function () {
 			this.mGlsl = GlslProg.create( new GlslProg.Format().vertexId( "vertShader").fragmentId( "fragShader" ) );
+		},
+
+		setupCubes: function () {
+			var numCubes = 20;
+			var offset = (numCubes / 2);
+			var i = 0;
+			var totalCubes = numCubes * numCubes * numCubes;
+			for (var z = 0; z < numCubes; z++) {
+				for( var y = 0; y < numCubes; y++ ) {
+					for (var x = 0; x < numCubes; x++ ) {
+
+						var position = new Vec3f( ( x - offset ),// * 1.1, 
+												 ( y - offset ),// * 1.1, 
+												 ( z - offset ) );// * 1.1 );
+
+						var intArray = new Int32Array( [ -1, -1, -1, -1, -1, -1 ] );
+						var normalized = i / totalCubes;
+						var color = new ColorA( 1.0 - normalized, normalized, 1.0, 1.0);
+
+						if( x !== 0 ) intArray[0] = i - 1;
+						if( y !== 0 ) intArray[1] = i - numCubes; 
+						if( z !== 0 ) intArray[2] = i - (numCubes * numCubes);
+						if( x !== (numCubes - 1) ) intArray[3] = i + 1;
+						if( y !== (numCubes - 1) ) intArray[4] = i + numCubes;
+						if( z !== (numCubes - 1) ) intArray[5] = i + (numCubes * numCubes);
+						
+						var cube = new Cube( Matrix44f.createTranslation( position ), intArray, i, color );
+						if( x === offset && y === offset && z === offset ) {
+							this.centerCube = cube;
+						}
+						this.cubes.push( cube );
+						i++;
+					}
+				}
+			}
 		},
 
 		setupBuffers: function () {
@@ -154,11 +227,18 @@
 		setupCamera: function () {
 			this.mCam = new CameraPersp();
 			this.mCam.setPerspective(60.0, cinder.getAspectRatio(), .01, 1000);
-			this.mCam.lookAt(new Vec3f( 0, 0, 5 ), new Vec3f( 0, 0, 0 ) );
+			this.mCam.lookAt(new Vec3f( 0, 0, 20 ), new Vec3f( 0, 0, 0 ) );
 		},
 
-		setUpdateFunc: function (updateFunc) {
-			this.mUpdateFunc = updateFunc;
+		activateRandomSet: function () {
+			for( var i = 0; i < this.centerCube.gridNeighborIndices.length; i++ ) { 
+				var active = app.cubes[this.centerCube.gridNeighborIndices[i]]; 
+				active.activate(); app.activeCubes.push(active);
+			}
+		},
+
+		removeActiveSet: function () {
+			this.activeCubes.length = 0;
 		},
 
 		transitionColor: function (hover) {
@@ -173,12 +253,11 @@
 		},
 
 		resize: function () {
-			this.mCam.setPerspective(60.0, cinder.getAspectRatio(), .01, 1000 );
+			this.mCam.setPerspective( 60.0, cinder.getAspectRatio(), .01, 10000 );
 			gl.viewport(0, 0, cinder.getWindowWidth(), cinder.getWindowHeight() );
 		},
 
 		update: function () {
-
 
 			if( ! this.mCurrentColor.equals(this.mTargetColor) ) {
 				var timeDifference = cinder.getElapsedSeconds() - this.mColorHoverStartTime;
@@ -191,15 +270,40 @@
 			}
 
 			if( this.mUpdateFunc != null ) {
-				this.mUpdateFunc();
+				if( ! this.mUpdateFunc() )
+					this.mUpdateFunc = null;
 			}
-			++this.mCurrentDegree;
-			this.mModelMatrix.multEq( Matrix44f.createRotation( new Vec3f( 1, 0, 1 ), MATH.toRadians(1) ) );
+			// this.mModelMatrix.multEq( Matrix44f.createRotation( new Vec3f( 0, 1, 0 ), MATH.toRadians(1) ) );
+
+			var elapsed = cinder.getElapsedSeconds();
+
+			if( ! this.activeCubes.length ) {
+				var next = this.centerCube.chooseNext();
+				var nextCube = this.cubes[next];
+				nextCube.activate( elapsed );
+				this.activeCubes.push( nextCube );
+			}
+
+			for (var i = this.activeCubes.length - 1; i >= 0; i--) {
+				if( this.activeCubes[i].isAlive( elapsed ) ) {
+					if( this.activeCubes[i].shouldChooseNext( elapsed ) ) {
+						var next = this.activeCubes[i].chooseNext();
+						if( next !== -1 ) { 
+							var nextCube = this.cubes[next];
+							nextCube.activate( elapsed );
+							this.activeCubes.push( nextCube );
+						}
+					}
+				}
+				else {
+					this.activeCubes.splice(i, 1);
+				}
+			}
 
 		},
 
 		draw: function () {
-			gl.clearColor(0.0, 0.0, 0.0, 1.0);
+			gl.clearColor(1.0, 1.0, 1.0, 1.0);
 			gl.clear(this.gl.COLOR_BUFFER_BIT);
 
 			this.mVao.bind();
@@ -208,22 +312,71 @@
 
 			gl.pushMatrices();
 			gl.setMatrices(this.mCam);
-			gl.pushModelView();
-				gl.setModelView( this.mCam.getModelViewMatrix().mult( this.mModelMatrix ) );
 
-					this.mGlsl.uniform("Color", this.mCurrentColor );
+			// drawing center cube
+			gl.pushModelView();
+
+					gl.setModelView( this.mCam.getModelViewMatrix().mult( this.mModelMatrix ) );
+					gl.multModelView( this.centerCube.translationMatrix );
+
+					var normalized = 555 / this.cubes.length;
+					
+					this.mGlsl.uniform("Color", this.centerCube.color );
 					this.mGlsl.uniform("modelViewMatrix", gl.getModelView() );
 					this.mGlsl.uniform("projectionMatrix", gl.getProjection());
 			
 					gl.drawElements( this.gl.TRIANGLE_STRIP, this.cube.getNumIndices(), this.gl.UNSIGNED_SHORT, 0 );
 
 			gl.popModelView();
+
+			for( var i = 0; i < this.activeCubes.length; i++ ) { 
+				gl.pushModelView();
+				gl.setModelView( this.mCam.getModelViewMatrix().mult( this.mModelMatrix ) );
+				gl.multModelView( this.activeCubes[i].translationMatrix );
+				
+				this.mGlsl.uniform("Color", this.activeCubes[i].color );
+				this.mGlsl.uniform("modelViewMatrix", gl.getModelView() );
+				this.mGlsl.uniform("projectionMatrix", gl.getProjection());
+			
+				gl.drawElements( this.gl.TRIANGLE_STRIP, this.cube.getNumIndices(), this.gl.UNSIGNED_SHORT, 0 );
+				gl.popModelView();
+			}
+			// var howMany = 0;
+			// if( cinder.getElapsedFrames() % 120 === 0 ) {
+			// 	howMany = Math.round(Math.random() * 10);
+			// }
+
+
+			// // drawing others
+			// for( var i = 0; i < this.cubes.length; i++ ) { 
+			// 	if( this.cubes[i].shouldShow ) {
+			// 		gl.pushModelView();
+			// 		gl.setModelView( this.mCam.getModelViewMatrix().mult( this.mModelMatrix ) );
+			// 		gl.multModelView( this.cubes[i].translationMatrix );
+
+			// 		var normalized = i / this.cubes.length;
+					
+			// 		this.mGlsl.uniform("Color", new ColorA( 1.0 - normalized, normalized, 1.0, 1.0) );
+			// 		this.mGlsl.uniform("modelViewMatrix", gl.getModelView() );
+			// 		this.mGlsl.uniform("projectionMatrix", gl.getProjection());
+			
+			// 		gl.drawElements( this.gl.TRIANGLE_STRIP, this.cube.getNumIndices(), this.gl.UNSIGNED_SHORT, 0 );
+			// 		gl.popModelView();
+			// 		if( howMany > 0 ) {
+			// 			howMany--;
+			// 			this.cubes[i].shouldShow = false;
+			// 		}
+			// 	}
+			// 	else if( cinder.getElapsedFrames() % 180 === 0 && Math.random() > .99 ) {
+			// 		this.cubes[i].shouldShow = true;
+			// 	}
+			// }
+
 			gl.popMatrices();
 		}
 	};
 
 	function ajaxRoutine (clickedLink) {
-		onClosePage();
 		$.ajax({
   			url: "/ajax/" + clickedLink,
   			cache: false
@@ -231,13 +384,13 @@
   		.done(function( html ) {
   			location.hash = clickedLink;
   			$("#content").html(html);
-  			onOpenPage();
   		});
 	}
 
 	function cinderSetupFunc () {
 		if( ! isRetina() ) {
 			new CINDER( "mycanvas", MyProgram );
+		var topMenu = $("#topmenu ul li");
 			topMenu.hover( function () {
 				cinder.getApp().transitionColor(true);
 			}, function () {
@@ -264,7 +417,6 @@
 		});
 		$("#websiteName").addClass('active');
 		cinderSetupFunc();
-		onOpenPage();
 	});
 </script>
 </html>

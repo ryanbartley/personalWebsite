@@ -1011,7 +1011,6 @@ Matrix44Base.prototype.rotate = function (rhVec, radians) { this.multEq( this.CO
 Matrix44Base.prototype.rotateEuler = function (rhVec) { this.multEq( this.CONSTRUCTOR_TYPE.createRotationEuler(rhVec) ); },
 Matrix44Base.prototype.rotateFromTo = function (fromVec, toVec, worldUpVec) { this.multEq( this.CONSTRUCTOR_TYPE.createRotationFromTo(fromVec, toVec, worldUpVec) ); };
 Matrix44Base.prototype.scale = function (rhType) {
-	console.log(rhType);
 	if( rhType.type !== undefined ) {
 		this.multEq( this.CONSTRUCTOR_TYPE.createScale(rhType) );
 	}
