@@ -2,6 +2,7 @@
 # listed in Gemfile.
 require 'bundler'
 Bundler.require
+require './database.rb'
 
 helpers do
   def render_erb(template)
@@ -31,6 +32,11 @@ end
 get '/resume' do
 	@page = 'resume'
 	erb :resume
+end
+
+get '/pacman' do
+	@page = 'pacman'
+	erb :pacman
 end
 
 get '/contact' do

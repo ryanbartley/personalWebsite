@@ -2,9 +2,11 @@
 <html>
 <head>
 	<title>Ryan Treese Bartley</title>
-	<script src="/js/jquery-1.9.1.js"></script>	
+	<script src="/js/jquery-1.9.1.js"></script>		
+	<link rel="stylesheet" type="text/css" href="/css/bootstrap.css">
 	<link rel="stylesheet" type="text/css" href="/css/application.css">
-	
+
+	<script src="/js/bootstrap.js"></script>
 	<script src="/js/cinder/Cinder.js"></script>
 	<script src="/js/cinder/math/Color.js"></script>
 	<script src="/js/cinder/math/OrigDim.js"></script>
@@ -49,6 +51,8 @@
 			<%= yield %>
 		</div>
 	</div>
+
+
 	
 </body>
 
@@ -230,11 +234,13 @@
 			this.mCam.lookAt(new Vec3f( 0, 0, 20 ), new Vec3f( 0, 0, 0 ) );
 		},
 
-		activateRandomSet: function () {
-			for( var i = 0; i < this.centerCube.gridNeighborIndices.length; i++ ) { 
-				var active = app.cubes[this.centerCube.gridNeighborIndices[i]]; 
-				active.activate(); app.activeCubes.push(active);
-			}
+		activateRandomSet: function ( elapsed ) {
+			var random = Math.round(this.cubes.length * Math.random());
+			var cube = this.cubes[random];
+			if( cube.isAlive( elapsed ) )
+				return;
+			cube.activate( elapsed );
+			this.activeCubes.push( cube );
 		},
 
 		removeActiveSet: function () {
@@ -283,6 +289,10 @@
 				nextCube.activate( elapsed );
 				this.activeCubes.push( nextCube );
 			}
+			else if( Math.random() > .9 ) {
+				console.log( "in here" );
+				this.activateRandomSet( elapsed );
+			}
 
 			for (var i = this.activeCubes.length - 1; i >= 0; i--) {
 				if( this.activeCubes[i].isAlive( elapsed ) ) {
@@ -299,7 +309,6 @@
 					this.activeCubes.splice(i, 1);
 				}
 			}
-
 		},
 
 		draw: function () {
